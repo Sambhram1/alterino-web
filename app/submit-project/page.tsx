@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,7 +29,7 @@ const categories = [
   { value: "Blockchain", label: "Blockchain" },
 ]
 
-export default function SubmitProjectPage() {
+function SubmitProjectForm() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
@@ -182,20 +182,19 @@ export default function SubmitProjectPage() {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-[#0D1117] py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {isEditing ? "Edit Your Project" : "Submit Your Project"}
-            </h1>
-            <p className="text-gray-400 text-lg">
-              {isEditing 
-                ? "Update your project information"
-                : "Share your amazing project with the Alterino community"
-              }
-            </p>
-          </div>
+    <div className="min-h-screen bg-[#0D1117] py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            {isEditing ? "Edit Your Project" : "Submit Your Project"}
+          </h1>
+          <p className="text-gray-400 text-lg">
+            {isEditing 
+              ? "Update your project information"
+              : "Share your amazing project with the Alterino community"
+            }
+          </p>
+        </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Form Section */}
@@ -476,9 +475,46 @@ export default function SubmitProjectPage() {
                 </CardContent>
               </Card>
             </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-[#0D1117] py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            Submit Your Project
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Share your amazing project with the Alterino community
+          </p>
+        </div>
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Card className="bg-gray-900/50 border-gray-700 shadow-2xl">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-center h-64">
+                  <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+export default function SubmitProjectPage() {
+  return (
+    <ProtectedRoute>
+      <Suspense fallback={<LoadingFallback />}>
+        <SubmitProjectForm />
+      </Suspense>
     </ProtectedRoute>
   )
 }
